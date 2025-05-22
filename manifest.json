@@ -1,6 +1,6 @@
 {
   "name": "Vergiss NIX",
-  "short_name": "Vergiss NIX",
+  "short_name": ,
   "description": "Die smarte Erinnerungshilfe!",
   "start_url": "index.html",
   "display": "standalone",
