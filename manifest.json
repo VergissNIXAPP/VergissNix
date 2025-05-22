@@ -1,7 +1,7 @@
 {
   "name": "Vergiss NIX",
   "short_name": "Vergiss NIX",
-  "description": "Die smarte Erinnerungshilfe für Verkäufer",
+  "description": "Die smarte Erinnerungshilfe!",
   "start_url": "index.html",
   "display": "standalone",
   "background_color": "#001c44",
