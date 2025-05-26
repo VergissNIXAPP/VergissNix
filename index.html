@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Powered by Andre Schorn</title>
+  <title>Vergiss NIX!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#003399">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -96,9 +96,8 @@
   <label><input type="checkbox" id="rememberMe" /> Eingeloggt bleiben</label>
   <button onclick="login()">Anmelden</button>
 </div>
-  
-<div id="appBox" class="glass hidden" style="position: relative;">
-  <button onclick="logout()" style="position: absolute; top: 10px; right: 10px; background: none; color: #fff; font-size: 16px; border: none; cursor: pointer;">🚪</button>
+
+<div id="appBox" class="glass hidden">
   <h2>🎤 Sprachnotiz</h2>
   <button onclick="startSpeech()">Jetzt sprechen</button>
   <div id="result" style="margin-top: 15px;"></div>
@@ -109,7 +108,7 @@
   const users = {
     "ansch": { password: "admin123", email: "Andre.Schorn@azf-gruppe.de" },
     "razan": { password: "rasmus123", email: "Rasmus.Zander@azf-gruppe.de" },
-    "jabee": { password: "beeck123", email: "Jan.Beeck@azf-gruppe.de" },
+    "jabee": { password: "beeck123", email: "Jan.BeeCk@azf-gruppe.de" },
     "erwes": { password: "erik123", email: "Erik.Weschke@azf-gruppe.de" }
   };
 
@@ -149,21 +148,12 @@
       alert("Falscher Benutzername oder Passwort");
     }
   }
-  
-  function logout() {
-  localStorage.removeItem("vergissUser");
-  currentUser = null;
-  document.getElementById("appBox").classList.add("hidden");
-  document.getElementById("loginBox").classList.remove("hidden");
-  document.getElementById("username").value = "";
-  document.getElementById("password").value = "";
-}
 
   function showApp() {
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("appBox").classList.remove("hidden");
   }
-  
+
   function startSpeech() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
@@ -256,24 +246,24 @@
     sendMail(currentUser.email, currentUser.email, text, date, time, id);
   }
 
-  function generateICS({ title, description, dateStr, timeStr }) {
-  const [day, month, year] = dateStr.split(".").map(n => parseInt(n, 10));
-  const [hours, minutes] = timeStr.split(":").map(n => parseInt(n, 10));
-  const startDate = new Date(year, month - 1, day, hours, minutes);
-  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // +1 Stunde
+  function generateICS({ title, description, startDate, startTime }) {
+    const [hours, minutes] = startTime.split(":").map(n => parseInt(n, 10));
+    startDate.setHours(hours, minutes, 0);
 
-  const pad = (n) => n.toString().padStart(2, "0");
+    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // +1h
 
-  const formatDateTime = (date) =>
-    date.getUTCFullYear() +
-    pad(date.getUTCMonth() + 1) +
-    pad(date.getUTCDate()) +
-    "T" +
-    pad(date.getUTCHours()) +
-    pad(date.getUTCMinutes()) +
-    "00Z";
+    const pad = (n) => n.toString().padStart(2, "0");
 
-  return `
+    const formatDateTime = (date) =>
+      date.getUTCFullYear() +
+      pad(date.getUTCMonth() + 1) +
+      pad(date.getUTCDate()) +
+      "T" +
+      pad(date.getUTCHours()) +
+      pad(date.getUTCMinutes()) +
+      "00Z";
+
+    return `
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//VergissNix//EN
@@ -286,8 +276,6 @@ SUMMARY:${title}
 DESCRIPTION:${description}
 END:VEVENT
 END:VCALENDAR`.trim();
-}
-
   }
 
   function addLog(entry) {
