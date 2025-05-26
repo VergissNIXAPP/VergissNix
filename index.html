@@ -256,24 +256,24 @@
     sendMail(currentUser.email, currentUser.email, text, date, time, id);
   }
 
-  function generateICS({ title, description, startDate, startTime }) {
-    const [hours, minutes] = startTime.split(":").map(n => parseInt(n, 10));
-    startDate.setHours(hours, minutes, 0);
+  function generateICS({ title, description, dateStr, timeStr }) {
+  const [day, month, year] = dateStr.split(".").map(n => parseInt(n, 10));
+  const [hours, minutes] = timeStr.split(":").map(n => parseInt(n, 10));
+  const startDate = new Date(year, month - 1, day, hours, minutes);
+  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // +1 Stunde
 
-    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // +1h
+  const pad = (n) => n.toString().padStart(2, "0");
 
-    const pad = (n) => n.toString().padStart(2, "0");
+  const formatDateTime = (date) =>
+    date.getUTCFullYear() +
+    pad(date.getUTCMonth() + 1) +
+    pad(date.getUTCDate()) +
+    "T" +
+    pad(date.getUTCHours()) +
+    pad(date.getUTCMinutes()) +
+    "00Z";
 
-    const formatDateTime = (date) =>
-      date.getUTCFullYear() +
-      pad(date.getUTCMonth() + 1) +
-      pad(date.getUTCDate()) +
-      "T" +
-      pad(date.getUTCHours()) +
-      pad(date.getUTCMinutes()) +
-      "00Z";
-
-    return `
+  return `
 BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:-//VergissNix//EN
@@ -286,6 +286,8 @@ SUMMARY:${title}
 DESCRIPTION:${description}
 END:VEVENT
 END:VCALENDAR`.trim();
+}
+
   }
 
   function addLog(entry) {
