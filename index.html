@@ -96,11 +96,11 @@
   <label><input type="checkbox" id="rememberMe" /> Eingeloggt bleiben</label>
   <button onclick="login()">Anmelden</button>
 </div>
-
-<div id="appBox" class="glass hidden">
+  
+<div id="appBox" class="glass hidden" style="position: relative;">
+  <button onclick="logout()" style="position: absolute; top: 10px; right: 10px; background: none; color: #fff; font-size: 16px; border: none; cursor: pointer;">🚪</button>
   <h2>🎤 Sprachnotiz</h2>
   <button onclick="startSpeech()">Jetzt sprechen</button>
-  <button onclick="logout()" style="background: transparent; color: #ccc; font-size: 14px; margin-top: 10px;">🚪 Logout</button>
   <div id="result" style="margin-top: 15px;"></div>
   <div id="logList"></div>
 </div>
