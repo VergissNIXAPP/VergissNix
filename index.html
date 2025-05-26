@@ -100,6 +100,7 @@
 <div id="appBox" class="glass hidden">
   <h2>🎤 Sprachnotiz</h2>
   <button onclick="startSpeech()">Jetzt sprechen</button>
+  <button onclick="logout()" style="background: transparent; color: #ccc; font-size: 14px; margin-top: 10px;">🚪 Logout</button>
   <div id="result" style="margin-top: 15px;"></div>
   <div id="logList"></div>
 </div>
@@ -148,12 +149,21 @@
       alert("Falscher Benutzername oder Passwort");
     }
   }
+  
+  function logout() {
+  localStorage.removeItem("vergissUser");
+  currentUser = null;
+  document.getElementById("appBox").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+  document.getElementById("username").value = "";
+  document.getElementById("password").value = "";
+}
 
   function showApp() {
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("appBox").classList.remove("hidden");
   }
-
+  
   function startSpeech() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
