@@ -281,14 +281,24 @@
 }
   
   function handleText(text) {
-    const { date, time, fullDateObj } = parseDate(text);
-    const id = Date.now();
-    const entry = { id, text, date, time, status: "🟡" };
-    logData.push(entry);
-    saveLogs();
-    addLog(entry);
-    sendMail(currentUser.email, currentUser.email, text, date, time, id);
-  }
+  const { date, time, fullDateObj } = parseDate(text);
+
+  // Datum und Uhrzeit aus dem Text entfernen
+  let cleanedText = text;
+  cleanedText = cleanedText
+    .replace(/(\d{1,2})[.:](\d{1,2})\s*uhr?/gi, "")  // Uhrzeit entfernen
+    .replace(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/g, "") // Datum im Format 01.01.2024 entfernen
+    .replace(/(?:am\s*)?(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)/gi, "") // ausgeschriebene Daten
+    .replace(/\b(heute|morgen|übermorgen|am\s+(montag|dienstag|mittwoch|donnerstag|freitag|samstag|sonntag))\b/gi, ""); // relative Daten
+  cleanedText = cleanedText.trim();
+
+  const id = Date.now();
+  const entry = { id, text: cleanedText, date, time, status: "🟡" };
+  logData.push(entry);
+  saveLogs();
+  addLog(entry);
+  sendMail(currentUser.email, currentUser.email, cleanedText, date, time, id);
+}
 
   function generateICS({ title, description, startDate, startTime }) {
     const [hours, minutes] = startTime.split(":").map(n => parseInt(n, 10));
