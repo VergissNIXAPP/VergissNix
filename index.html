@@ -33,6 +33,7 @@
       padding: 30px;
       width: 90%; max-width: 420px;
       animation: fadeIn 0.6s ease-out;
+      position: relative;
     }
     input[type="text"], input[type="password"] {
       width: 100%; padding: 12px;
@@ -80,9 +81,33 @@
       from { opacity: 0; transform: scale(0.96); }
       to   { opacity: 1; transform: scale(1); }
     }
+    .logout {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: transparent;
+      color: white;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      z-index: 100;
+    }
+    .logout:hover {
+      opacity: 0.7;
+    }
+    .user-greeting {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #00dfff;
+    }
   </style>
 </head>
 <body>
+
+<!-- Logout Button -->
+<button id="logoutBtn" onclick="logout()" class="logout hidden" title="Abmelden">🚪</button>
 
 <div id="splash" class="glass">
   <h1>🧠 Vergiss NIX</h1>
@@ -98,6 +123,7 @@
 </div>
 
 <div id="appBox" class="glass hidden">
+  <div class="user-greeting" id="userGreeting">Hallo!</div>
   <h2>🎤 Sprachnotiz</h2>
   <button onclick="startSpeech()">Jetzt sprechen</button>
   <div id="result" style="margin-top: 15px;"></div>
@@ -106,10 +132,10 @@
 
 <script>
   const users = {
-    "ansch": { password: "admin123", email: "Andre.Schorn@azf-gruppe.de" },
-    "razan": { password: "rasmus123", email: "Rasmus.Zander@azf-gruppe.de" },
-    "jabee": { password: "beeck123", email: "Jan.BeeCk@azf-gruppe.de" },
-    "erwes": { password: "erik123", email: "Erik.Weschke@azf-gruppe.de" }
+    "ansch": { password: "admin123", email: "Andre.Schorn@azf-gruppe.de", name: "Andre" },
+    "razan": { password: "rasmus123", email: "Rasmus.Zander@azf-gruppe.de", name: "Rasmus" },
+    "jabee": { password: "beeck123", email: "Jan.BeeCk@azf-gruppe.de", name: "Jan" },
+    "erwes": { password: "erik123", email: "Erik.Weschke@azf-gruppe.de", name: "Erik" }
   };
 
   let currentUser = null;
@@ -152,6 +178,16 @@
   function showApp() {
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("appBox").classList.remove("hidden");
+    document.getElementById("logoutBtn").classList.remove("hidden");
+    document.getElementById("userGreeting").textContent = `Hallo ${currentUser.name}!`;
+  }
+
+  function logout() {
+    localStorage.removeItem("vergissUser");
+    currentUser = null;
+    document.getElementById("appBox").classList.add("hidden");
+    document.getElementById("logoutBtn").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
   }
 
   function startSpeech() {
