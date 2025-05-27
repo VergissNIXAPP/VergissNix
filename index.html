@@ -96,11 +96,10 @@
       opacity: 0.7;
     }
     .user-greeting {
-      text-align: center;
-      margin-bottom: 20px;
       font-size: 18px;
       font-weight: bold;
       color: #00dfff;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -109,9 +108,11 @@
 <!-- Logout Button -->
 <button id="logoutBtn" onclick="logout()" class="logout hidden" title="Abmelden">🚪</button>
 
+<!-- Begrüßung direkt im Header -->
 <div id="splash" class="glass">
   <h1>🧠 Vergiss NIX</h1>
   <p>Dein smarter Erinnerungshelfer</p>
+  <p id="userGreeting" class="user-greeting hidden"></p>
 </div>
 
 <div id="loginBox" class="glass hidden">
@@ -123,7 +124,6 @@
 </div>
 
 <div id="appBox" class="glass hidden">
-  <div class="user-greeting" id="userGreeting">Hallo!</div>
   <h2>🎤 Sprachnotiz</h2>
   <button onclick="startSpeech()">Jetzt sprechen</button>
   <div id="result" style="margin-top: 15px;"></div>
@@ -179,7 +179,10 @@
     document.getElementById("loginBox").classList.add("hidden");
     document.getElementById("appBox").classList.remove("hidden");
     document.getElementById("logoutBtn").classList.remove("hidden");
-    document.getElementById("userGreeting").textContent = `Hallo ${currentUser.name}!`;
+
+    const greetingEl = document.getElementById("userGreeting");
+    greetingEl.textContent = `Hallo ${currentUser.name}!`;
+    greetingEl.classList.remove("hidden");
   }
 
   function logout() {
@@ -188,6 +191,7 @@
     document.getElementById("appBox").classList.add("hidden");
     document.getElementById("logoutBtn").classList.add("hidden");
     document.getElementById("loginBox").classList.remove("hidden");
+    document.getElementById("userGreeting").classList.add("hidden");
   }
 
   function startSpeech() {
@@ -210,7 +214,6 @@
       handleText(text);
     };
   }
-
   function parseDate(text) {
   const now = new Date();
   let resultDate = new Date(now);
