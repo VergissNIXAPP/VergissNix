@@ -176,66 +176,69 @@
   }
 
   function parseDate(text) {
-    const now = new Date();
-    let resultDate = new Date(now);
-    let dateStr = now.toLocaleDateString("de-DE");
-    let timeStr = now.toLocaleTimeString("de-DE", { hour: "2-digit", minute: "2-digit" });
+  const now = new Date();
+  let resultDate = new Date(now);
+  let dateStr = now.toLocaleDateString("de-DE");
+  let timeStr = "09:00"; // Standardzeit
 
-    const fullDMY = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
-    if (fullDMY) {
-      const day = parseInt(fullDMY[1], 10);
-      const month = parseInt(fullDMY[2], 10) - 1;
-      const year = parseInt(fullDMY[3], 10);
-      resultDate = new Date(year, month, day);
+  const fullDMY = text.match(/(\d{1,2})\.(\d{1,2})\.(\d{4})/);
+  if (fullDMY) {
+    const day = parseInt(fullDMY[1], 10);
+    const month = parseInt(fullDMY[2], 10) - 1;
+    const year = parseInt(fullDMY[3], 10);
+    resultDate = new Date(year, month, day);
+    dateStr = resultDate.toLocaleDateString("de-DE");
+  } else {
+    const monthMap = {
+      januar: 0, februar: 1, märz: 2, maerz: 2, april: 3, mai: 4,
+      juni: 5, juli: 6, august: 7, september: 8,
+      oktober: 9, november: 10, dezember: 11
+    };
+
+    const fullDateMatch = text.match(/(?:am\s*)?(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)/i);
+    if (fullDateMatch) {
+      const day = parseInt(fullDateMatch[1], 10);
+      const month = monthMap[fullDateMatch[2].toLowerCase()];
+      if (!isNaN(day) && month !== undefined) {
+        resultDate = new Date(now.getFullYear(), month, day);
+        if (resultDate < now) resultDate.setFullYear(now.getFullYear() + 1);
+        dateStr = resultDate.toLocaleDateString("de-DE");
+      }
+    } else if (text.includes("heute")) {
+      resultDate = new Date(now);
+      dateStr = resultDate.toLocaleDateString("de-DE");
+    } else if (text.includes("übermorgen")) {
+      resultDate.setDate(now.getDate() + 2);
+      dateStr = resultDate.toLocaleDateString("de-DE");
+    } else if (text.includes("morgen")) {
+      resultDate.setDate(now.getDate() + 1);
       dateStr = resultDate.toLocaleDateString("de-DE");
     } else {
-      const monthMap = {
-        januar: 0, februar: 1, märz: 2, maerz: 2, april: 3, mai: 4,
-        juni: 5, juli: 6, august: 7, september: 8,
-        oktober: 9, november: 10, dezember: 11
-      };
-
-      const fullDateMatch = text.match(/(?:am\s*)?(\d{1,2})\.\s*(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)/i);
-      if (fullDateMatch) {
-        const day = parseInt(fullDateMatch[1], 10);
-        const month = monthMap[fullDateMatch[2].toLowerCase()];
-        if (!isNaN(day) && month !== undefined) {
-          resultDate = new Date(now.getFullYear(), month, day);
-          if (resultDate < now) resultDate.setFullYear(now.getFullYear() + 1);
+      const weekdays = ["sonntag", "montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag"];
+      for (let i = 0; i < weekdays.length; i++) {
+        if (text.toLowerCase().includes("am " + weekdays[i])) {
+          const dayOffset = (i - now.getDay() + 7) % 7 || 7;
+          resultDate.setDate(now.getDate() + dayOffset);
           dateStr = resultDate.toLocaleDateString("de-DE");
-        }
-      } else if (text.includes("heute")) {
-        dateStr = now.toLocaleDateString("de-DE");
-      } else if (text.includes("übermorgen")) {
-        resultDate.setDate(now.getDate() + 2);
-        dateStr = resultDate.toLocaleDateString("de-DE");
-      } else if (text.includes("morgen")) {
-        resultDate.setDate(now.getDate() + 1);
-        dateStr = resultDate.toLocaleDateString("de-DE");
-      } else {
-        const weekdays = ["sonntag", "montag", "dienstag", "mittwoch", "donnerstag", "freitag", "samstag"];
-        for (let i = 0; i < weekdays.length; i++) {
-          if (text.toLowerCase().includes("am " + weekdays[i])) {
-            const dayOffset = (i - now.getDay() + 7) % 7 || 7;
-            resultDate.setDate(now.getDate() + dayOffset);
-            dateStr = resultDate.toLocaleDateString("de-DE");
-          }
         }
       }
     }
-
-    const timeMatch = text.match(/(\d{1,2})[:\.](\d{1,2})\s*uhr?/i);
-    if (timeMatch) {
-      const h = timeMatch[1].padStart(2, "0");
-      const m = timeMatch[2].padStart(2, "0");
-      timeStr = `${h}:${m}`;
-    } else {
-      timeStr = "09:00"; // Standardzeit
-    }
-
-    return { date: dateStr, time: timeStr, fullDateObj: resultDate };
   }
 
+  const timeMatch = text.match(/(\d{1,2})[:\.](\d{1,2})\s*uhr?/i);
+  if (timeMatch) {
+    const h = parseInt(timeMatch[1], 10);
+    const m = parseInt(timeMatch[2], 10);
+    resultDate.setHours(h, m, 0);
+    timeStr = `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
+  } else {
+    resultDate.setHours(9, 0, 0); // Standardzeit setzen
+    timeStr = "09:00";
+  }
+
+  return { date: dateStr, time: timeStr, fullDateObj: resultDate };
+}
+  
   function handleText(text) {
     const { date, time, fullDateObj } = parseDate(text);
     const id = Date.now();
